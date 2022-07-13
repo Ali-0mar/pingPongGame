@@ -1,8 +1,7 @@
 // Canvas
 const { body } = document;
 const canvas = document.createElement('canvas');
-const ctx = canvas.getContext("2d");
-
+const context = canvas.getContext('2d');
 const width = 500;
 const height = 700;
 const screenWidth = window.screen.width;
@@ -14,10 +13,9 @@ const gameOverEl = document.createElement('div');
 const paddleHeight = 10;
 const paddleWidth = 50;
 const paddleDiff = 25;
-//the paddel is set t0 225 on X Axis because the container is 500px and the paddle itself is 50px so to centrelize it we type 225
 let paddleBottomX = 225;
 let paddleTopX = 225;
-let isplayerMoved = false;
+let playerMoved = false;
 let paddleContact = false;
 
 // Ball
@@ -45,44 +43,43 @@ if(isMobile.matches) {
 // Score
 let playerScore = 0;
 let computerScore = 0;
-const winningScore = 5;
+const winningScore = 7;
 let isGameOver = true;
 let isNewGame = true;
 
 // Render Everything on Canvas
 function renderCanvas() {
   // Canvas Background
-  ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, width, height);
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, width, height);
 
   // Paddle Color
-  ctx.fillStyle = '#fff';
+  context.fillStyle = 'white';
 
   // Player Paddle (Bottom)
-  ctx.fillRect(paddleBottomX, height - 20, paddleWidth, paddleHeight);
+  context.fillRect(paddleBottomX, height - 20, paddleWidth, paddleHeight);
 
   // Computer Paddle (Top)
-  ctx.fillRect(paddleTopX, 10, paddleWidth, paddleHeight);
+  context.fillRect(paddleTopX, 10, paddleWidth, paddleHeight);
 
   // Dashed Center Line
-  ctx.beginPath();
-  ctx.setLineDash([8]);
-  //the hieght of our canvas is 700px so 350 to make the line in the middle
-  ctx.moveTo(0, 350);
-  ctx.lineTo(500, 350);
-  ctx.strokeStyle = 'grey';
-  ctx.stroke();
+  context.beginPath();
+  context.setLineDash([4]);
+  context.moveTo(0, 350);
+  context.lineTo(500, 350);
+  context.strokeStyle = 'grey';
+  context.stroke();
 
   // Ball
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius, 2 * Math.PI, false);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
+  context.beginPath();
+  context.arc(ballX, ballY, ballRadius, 2 * Math.PI, false);
+  context.fillStyle = 'white';
+  context.fill();
 
   // Score
-  ctx.font = '32px Courier N ew';
-  ctx.fillText(playerScore, 20, canvas.height / 2 + 50);
-  ctx.fillText(computerScore, 20, canvas.height / 2 - 30);
+  context.font = '32px Courier New';
+  context.fillText(playerScore, 20, canvas.height / 2 + 50);
+  context.fillText(computerScore, 20, canvas.height / 2 - 30);
 }
 
 // Create Canvas Element
@@ -93,9 +90,6 @@ function createCanvas() {
   renderCanvas();
 }
 
-// Remove this
-createCanvas();
-
 // Reset Ball to Center
 function ballReset() {
   ballX = width / 2;
@@ -104,12 +98,12 @@ function ballReset() {
   paddleContact = false;
 }
 
-// Adjust Ball Movement and speed
+// Adjust Ball Movement
 function ballMove() {
   // Vertical Speed
   ballY += -speedY;
   // Horizontal Speed
-  if(isplayerMoved && paddleContact) {
+  if(playerMoved && paddleContact) {
     ballX += speedX;
   }
 }
@@ -129,7 +123,7 @@ function ballBoundaries() {
     if(ballX > paddleBottomX && ballX < paddleBottomX + paddleWidth) {
       paddleContact = true;
       // Add Speed on Hit
-      if(isplayerMoved) {
+      if(playerMoved) {
         speedY -= 1;
         // Max Speed
         if(speedY < -5) {
@@ -150,7 +144,7 @@ function ballBoundaries() {
   if(ballY < paddleDiff) {
     if(ballX > paddleTopX && ballX < paddleTopX + paddleWidth) {
       // Add Speed on Hit
-      if(isplayerMoved) {
+      if(playerMoved) {
         speedY += 1;
         // Max Speed
         if(speedY > 5) {
@@ -166,9 +160,9 @@ function ballBoundaries() {
   }
 }
 
-// Computer Movement Adjusted to move a bit slower than the ball
+// Computer Movement
 function computerAI() {
-  if(isplayerMoved) {
+  if(playerMoved) {
     if(paddleTopX + paddleDiff < ballX) {
       paddleTopX += computerSpeed;
     } else {
@@ -193,7 +187,6 @@ function showGameOverEl(winner) {
   // Append
   gameOverEl.append(title, playAgainBtn);
   body.appendChild(gameOverEl);
-
 }
 
 // Check If One Player Has Winning Score, If They Do, End Game
@@ -201,12 +194,12 @@ function gameOver() {
   if(playerScore === winningScore || computerScore === winningScore) {
     isGameOver = true;
     // Set Winner
-    let winner = playerScore === winningScore ? "Player 1" : "Computer";
+    const winner = playerScore === winningScore ? 'Player 1' : 'Computer';
     showGameOverEl(winner);
   }
 }
 
-// rerender the frame on every move
+// Called Every Frame
 function animate() {
   renderCanvas();
   ballMove();
@@ -220,7 +213,6 @@ function animate() {
 
 // Start Game, Reset Everything
 function startGame() {
-  //this will run only when the game is over and we are trying to start a new game
   if(isGameOver && !isNewGame) {
     body.removeChild(gameOverEl);
     canvas.hidden = false;
@@ -231,13 +223,10 @@ function startGame() {
   computerScore = 0;
   ballReset();
   createCanvas();
-  //start the animation
   animate();
   canvas.addEventListener('mousemove', (e) => {
-    console.log("1====>e.clientX", e.clientX);
-    //
-    isplayerMoved = true;
-    // making sure the canvas staying centered and the paddles not going outside the canvas
+    playerMoved = true;
+    // Compensate for canvas being centered
     paddleBottomX = e.clientX - canvasPosition - paddleDiff;
     if(paddleBottomX < paddleDiff) {
       paddleBottomX = 0;
