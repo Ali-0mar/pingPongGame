@@ -23,7 +23,7 @@ let ballDirection = 1;
 // Speed
 let speedY = 2;
 let speedX = 0;
-let computerSpeed = 4;
+let computerSpeed = 6;
 
 // Score for Both Players
 let score = [0, 0];
@@ -147,8 +147,8 @@ function ballBoundaries() {
       speedX = trajectoryX[1] * 0.3;
     } else {
       // Reset Ball, Increase Computer Difficulty, add to Player Score
-      if(computerSpeed < 6) {
-        computerSpeed += 0.5;
+      if(computerSpeed < 7) {
+        computerSpeed += 0.7;
       }
       ballReset();
       score[0]++;
